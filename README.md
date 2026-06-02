@@ -107,8 +107,9 @@ MIT
   title = {{xScore}: A Machine Learning Framework for Evaluating {NFL} Team
            Performance and Playoff Success},
   year = {2026},
-  eprint = {TBD},
-  archiveprefix = {arXiv},
-  primaryclass = {stat.AP}
+  howpublished = {SSRN preprint},
+  doi = {10.2139/ssrn.6870618},
+  url =  {https://papers.ssrn.com/so13/papers.cfm?abstract_id=6870618},
+  note = {Extended version with full derivations and robustness analysis}
 }
 ```
