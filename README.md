@@ -19,7 +19,7 @@ This codebase supports three companion papers:
 2. **Game Deserved Score: Decomposing NFL Team Quality into Offensive, Defensive, and Special Teams Value** (Paper 2)
 3. **Does Defense Win Championships? A Five-Method Statistical Test Using Drive-Level Team Quality Decomposition** (Paper 3)
 
-Extended version (arXiv preprint): Mecha, L. (2026). *xScore: A Machine Learning Framework for Evaluating NFL Team Performance and Playoff Success.*
+Extended version: Mecha, L. (2026). *xScore: A Machine Learning Framework for Evaluating NFL Team Performance and Playoff Success.* SSRN preprint. https://papers.ssrn.com/so13/papers.cfm?abstract_id=6870618
 
 ## Quick Start
 
@@ -109,7 +109,6 @@ MIT
   year = {2026},
   howpublished = {SSRN preprint},
   doi = {10.2139/ssrn.6870618},
-  url =  {https://papers.ssrn.com/so13/papers.cfm?abstract_id=6870618},
-  note = {Extended version with full derivations and robustness analysis}
+  url =  {https://papers.ssrn.com/so13/papers.cfm?abstract_id=6870618}
 }
 ```
