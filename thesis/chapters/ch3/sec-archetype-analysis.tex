@@ -1,0 +1,532 @@
+\section{Archetype Analysis: Statistical Design}
+\label{sec:archetype-analysis}
+
+The preceding sections establish the \xscore{} model (\Cref{sec:xscore}) and
+the \gds{} framework (\Cref{sec:gds}) as tools for measuring team performance
+in expected-point units, decomposed into offensive, defensive, and
+special teams channels. This section describes how those measurements are used
+to test a canonical claim in American football discourse: that defensive
+strength is a more reliable pathway to postseason success than offensive
+strength. The section proceeds from the operationalization of the research
+question through to the sample size and power considerations that govern the
+interpretation of results.
+
+% ============================================================
+\subsection{Research Question and Hypotheses}
+\label{sec:hypotheses}
+% ============================================================
+
+The popular aphorism ``defense wins championships'' -- sometimes rendered in
+its fuller form as ``offense wins games, defense wins championships'' -- is
+an empirical claim about the relative importance of defensive performance
+in determining postseason outcomes \parencite{robst2011defense}.
+\textcite{robst2011defense} examined this claim using conventional metrics
+and found mixed support at best; the present analysis revisits the question
+with the higher-resolution decomposition afforded by \gds{}-derived \xvoa{}
+values.
+
+To give the claim precise, falsifiable content, it is decomposed into three
+testable hypotheses. Each hypothesis is stated in terms of the archetype
+variables defined in \Cref{sec:ivs}.
+
+\begin{description}
+  \item[H1 (Postseason advancement).] Defense-dominant team-seasons, defined
+        by a negative offense share (i.e., teams for which defensive
+        \xvoa{} contributes more to overall \gds{} than offensive \xvoa{}),
+        achieve higher mean playoff-win totals than offense-dominant
+        team-seasons among playoff qualifiers.
+
+  \item[H2 (Super Bowl over-representation).] Super Bowl winners are
+        disproportionately drawn from defense-dominant team-seasons relative to
+        the base rate of defense dominance among all playoff qualifiers.
+
+  \item[H3 (Correlation asymmetry).] Defensive \xvoa{} per game exhibits a
+        stronger monotonic association with playoff wins among playoff teams than
+        offensive \xvoa{} per game does.
+\end{description}
+
+If all three hypotheses are supported, the evidence is consistent with the
+``defense wins championships'' narrative. Rejection of any single hypothesis
+constitutes evidence against the claim and shifts the interpretive burden toward
+alternative explanations -- including the possibility that offensive quality is
+equally or more important, or that the claim only holds in specific eras or
+roster-strength contexts. The analysis is designed so that the three hypotheses
+are logically independent: a team-season structure that would support H1 (e.g.,
+defense-dominant teams advancing further) need not automatically support H2
+(which concerns the extreme tail of one Super Bowl winner per season) or H3
+(which concerns marginal correlations across the full playoff sample). This
+independence ensures that any finding is not an artifact of a single operationalization.
+
+% ============================================================
+\subsection{Independent Variables}
+\label{sec:ivs}
+% ============================================================
+
+The analysis uses four independent variables derived from \gds{}-level
+aggregates at the team-season level. Per-game averages are used throughout
+to adjust for the small number of team-seasons that played more or fewer
+games due to schedule irregularities. \Cref{tab:ivs} summarizes the variables,
+their definitions, and their intended interpretations.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Independent variables in the archetype analysis. All variables are
+           computed at the team-season level using regular-season games only.
+           Per-game averages remove the effect of schedule length variation.}
+  \label{tab:ivs}
+  \begin{tabularx}{\textwidth}{llX}
+    \toprule
+    \textbf{Variable} & \textbf{Type} & \textbf{Definition} \\
+    \midrule
+    \texttt{offense\_share}
+      & Continuous $[-1, +1]$
+      & Proportion of total absolute \xvoa{} attributable to the offense
+        (see \Cref{eq:offense-share}). Positive values indicate
+        offense-dominant teams; negative values indicate defense-dominant teams. \\[6pt]
+    \texttt{gds\_per\_game}
+      & Continuous
+      & Mean \gds{} per regular-season game. Measures overall team quality
+        in expected-point units, independent of the offensive/defensive
+        split. \\[6pt]
+    \texttt{off\_xvoa\_per\_game}
+      & Continuous
+      & Mean offensive \xvoa{} per regular-season game. Direct measure of
+        offensive output above or below situational expectation. \\[6pt]
+    \texttt{def\_xvoa\_per\_game}
+      & Continuous
+      & Mean defensive \xvoa{} per regular-season game. Direct measure of
+        defensive suppression above or below situational expectation.
+        Positive values indicate above-average defensive performance. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+The key analytical variable is \texttt{offense\_share}, which isolates the
+\emph{balance} between offensive and defensive contribution independently of
+overall team quality. It is defined as:
+
+\begin{equation}
+  \label{eq:offense-share}
+  \texttt{offense\_share} =
+  \frac{\texttt{off\_xvoa\_per\_game}}
+       {|\texttt{off\_xvoa\_per\_game}| + |\texttt{def\_xvoa\_per\_game}| + \varepsilon},
+\end{equation}
+
+where $\varepsilon = 0.01$ is a small regularization constant that prevents
+division by zero for teams with negligible \xvoa{} in both channels. The
+denominator is the sum of the absolute magnitudes of the two \xvoa{} components,
+so the ratio measures the fraction of the team's total absolute performance
+attributable to offense. The $\varepsilon$ term does not materially affect the
+result for any team with non-trivial \xvoa{} values, since realistic per-game
+\xvoa{} magnitudes are on the order of $1$--$12$ expected-point units per game.
+
+The resulting variable ranges from $-1$ to $+1$ by construction. A value of
+$+1$ would correspond to a team whose entire positive performance derives from
+offense with zero defensive contribution; a value of $-1$ would correspond to
+the symmetric defensive extreme. In practice, most team-seasons fall in the
+range $[-0.6, +0.6]$, reflecting the empirical reality that competitive NFL
+teams generate meaningful contributions from both phases. The threshold values
+used in the Cohen's d analysis (\Cref{sec:cohens-d}) are $+0.3$ for
+offense-dominant and $-0.3$ for defense-dominant, chosen to separate teams
+with a clear lean from those near the boundary.
+
+The variables \texttt{off\_xvoa\_per\_game} and \texttt{def\_xvoa\_per\_game}
+are included as component-level predictors in the logistic regression and OLS
+models described in \Cref{sec:stat-tests}. Using components rather than
+\texttt{offense\_share} alone allows the models to estimate whether it is the
+absolute level of defensive performance -- rather than merely its dominance
+relative to offense -- that predicts Super Bowl success and playoff advancement.
+The \texttt{gds\_per\_game} variable serves as a quality control variable in
+the OLS model, ensuring that any offense-share effect on playoff wins is not
+simply a proxy for overall team strength.
+
+As a robustness check for schedule-strength confounding, the OLS regression
+is re-estimated with an opponent-quality control variable
+(\texttt{opp\_avg\_gds}). This variable is constructed via a leave-one-out
+procedure: for each team-season $i$, the mean \gds{}/game of all opponents
+faced during the regular season is computed, excluding the focal team's own
+contribution to those opponents' schedules. The leave-one-out construction
+prevents the mechanical correlation that would arise if a team's own quality
+inflated its opponents' apparent strength (since each opponent's \gds{}
+partially reflects having played the focal team). If the offensive advantage
+documented in the primary analysis is an artifact of schedule imbalance -- for
+example, if offense-dominant teams systematically face weaker schedules -- then
+including \texttt{opp\_avg\_gds} as a covariate should attenuate or eliminate
+the offensive \xvoa{} coefficient in the controlled regression.
+
+% ============================================================
+\subsection{Dependent Variables}
+\label{sec:dvs}
+% ============================================================
+
+The analysis uses three dependent variables that capture postseason outcomes
+at increasing levels of selectivity. \Cref{tab:dvs} summarizes the variables
+and their measurement properties.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Dependent variables in the archetype analysis. Playoff wins counts
+           actual games played and won in the postseason; a bye week is not
+           treated as a win because no game was played.}
+  \label{tab:dvs}
+  \begin{tabularx}{\textwidth}{llX}
+    \toprule
+    \textbf{Variable} & \textbf{Type} & \textbf{Description} \\
+    \midrule
+    \texttt{win\_pct}
+      & Continuous $[0, 1]$
+      & Regular-season win fraction. Used to assess whether offensive and
+        defensive \xvoa{} components predict season-level success. \\[6pt]
+    \texttt{playoff\_wins}
+      & Ordinal integer $\{0, 1, 2, 3, 4\}$
+      & Number of postseason games won. A value of $0$ indicates either
+        missing the playoffs or a first-round exit. A Super Bowl winner
+        receives 3 if they had a first-round bye (top seeds in all
+        seasons) or 4 if they played the Wild Card round. \\[6pt]
+    \texttt{won\_super\_bowl}
+      & Binary $\{0, 1\}$
+      & Indicator for whether the team won the Super Bowl in that
+        season. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+The decision to measure playoff success as \texttt{playoff\_wins} rather than
+a binary playoff-appearance indicator reflects the hierarchical structure of
+the NFL postseason. Making the playoffs requires above-average regular-season
+performance, but it is a threshold event: a 12-win team that loses in the
+Wild Card round and an 8-win team that receives a first-round bye and also
+loses in the Divisional round are both credited with zero playoff wins. The
+ordinal measure distinguishes these outcomes and captures the degree of
+postseason advancement, which is the more theoretically relevant quantity for
+testing whether team archetypes predict deep runs.
+
+It is important to note that bye weeks are not counted as wins.
+During the 2018--2019 seasons, the NFL's six-team playoff bracket granted two
+first-round byes per conference. From 2020 onward, the expanded seven-team
+bracket reduced this to one bye per conference. Across the study
+window, a team with a first-round bye that won three subsequent games is
+credited with three playoff wins, not four. This design ensures that
+\texttt{playoff\_wins} reflects actual game performance rather than seeding
+advantages, which is consistent with the framework's general philosophy of
+measuring performance against outcomes rather than structural position.
+
+% ============================================================
+\subsection{Statistical Tests}
+\label{sec:stat-tests}
+% ============================================================
+
+Five statistical procedures are employed, each motivated by the measurement
+level and distributional properties of the variables involved.
+
+\subsubsection{Spearman Rank Correlation}
+\label{sec:spearman}
+
+The primary test of H1 and H3 uses the Spearman rank correlation coefficient
+between \texttt{offense\_share} and \texttt{playoff\_wins}, computed on the
+subsample of playoff team-seasons. The Spearman coefficient is appropriate here
+for two reasons. First, \texttt{playoff\_wins} is an ordinal variable with a
+bounded range of 0--4; treating it as interval-scaled for Pearson correlation
+would impose an equal-spacing assumption that may not hold
+(the difficulty of advancing from Round 2 to Round 3 is not necessarily
+identical to that of advancing from Round 1 to Round 2). Second, the
+monotonic but potentially non-linear nature of the relationship between team
+balance and playoff success is better captured by a rank-based measure that
+does not impose linearity.
+
+For H3, the Spearman correlation is computed separately for offensive
+\xvoa{}/game versus playoff wins and defensive \xvoa{}/game versus playoff
+wins. The magnitudes of the two coefficients are then compared to determine
+which component exhibits the stronger association with playoff advancement.
+
+\subsubsection{Pearson Correlation}
+
+Pearson product-moment correlations are computed between offensive
+\xvoa{}/game and win percentage, and between defensive \xvoa{}/game and win
+percentage, using all 224 team-seasons. The use of Pearson rather than
+Spearman is appropriate here because win percentage is a continuous
+proportion that is approximately normally distributed at the team-season
+level, and the linear relationship between per-game \xvoa{} and season win
+rate is theoretically motivated by the additive structure of the \gds{}
+framework.
+
+These correlations serve as a consistency check: if the \gds{} decomposition
+is well-calibrated, both offensive and defensive \xvoa{} should exhibit strong
+positive correlations with win rate, confirming that the components measure
+genuine performance signal. The relative magnitudes of the two correlations
+provide initial evidence bearing on H3.
+
+\subsubsection{Binary Logistic Regression}
+\label{sec:logistic}
+
+To test H2, a binary logistic regression model is estimated with
+Super Bowl victory as the outcome variable and offensive and defensive
+\xvoa{}/game as predictors across all 224 team-seasons:
+
+\begin{equation}
+  \label{eq:logistic}
+  \log \frac{P(\texttt{won\_SB} = 1)}{P(\texttt{won\_SB} = 0)}
+  = \beta_0
+    + \beta_1 \cdot \texttt{off\_xvoa/g}
+    + \beta_2 \cdot \texttt{def\_xvoa/g}.
+\end{equation}
+
+The coefficients $\beta_1$ and $\beta_2$ measure the change in log-odds of
+Super Bowl victory associated with a one-unit increase in offensive or
+defensive \xvoa{} per game, holding the other component constant. A finding
+of $|\hat{\beta}_2| > |\hat{\beta}_1|$ would be consistent with H2 in the
+sense that defensive \xvoa{} has greater marginal predictive value for the
+championship outcome. The model follows the standard formulation of binary
+logistic regression as described in \textcite{hosmer2013logistic}.
+
+Standard errors, Wald $z$-statistics, and $p$-values are reported for each
+coefficient. Confidence intervals are constructed at the 95\% level. The
+model is estimated by maximum likelihood; convergence is assessed by
+inspecting the log-likelihood at each iteration.
+
+\subsubsection{Ordinary Least Squares Regression}
+
+An OLS regression of \texttt{playoff\_wins} on \texttt{offense\_share} and
+\texttt{gds\_per\_game} is estimated across all 224 team-seasons:
+
+\begin{equation}
+  \label{eq:ols}
+  \texttt{playoff\_wins}_i
+  = \alpha
+    + \gamma_1 \cdot \texttt{offense\_share}_i
+    + \gamma_2 \cdot \texttt{gds\_per\_game}_i
+    + \varepsilon_i.
+\end{equation}
+
+The inclusion of \texttt{gds\_per\_game} as a covariate is critical: without
+it, any observed association between \texttt{offense\_share} and
+\texttt{playoff\_wins} could be confounded by overall team quality. Strong
+teams advance further in the playoffs regardless of their offensive/defensive
+balance; the coefficient on \texttt{offense\_share} is interpretable only after
+this quality effect is partialled out. The coefficient $\hat{\gamma}_1$
+therefore measures the marginal effect of shifting the balance between offensive
+and defensive \xvoa{} on expected playoff wins, holding overall \gds{} per game
+constant.
+
+Although \texttt{playoff\_wins} is technically ordinal rather than continuous,
+OLS on ordinal outcomes with a small number of categories is widely used in
+applied social-science research and provides interpretable coefficient estimates
+\parencite{long1997regression}. Because the outcome is zero-inflated
+(approximately 58\% of team-seasons have zero playoff wins), residuals are
+heteroscedastic; all reported standard errors and $p$-values use
+heteroscedasticity-consistent (HC3) estimates. The Spearman correlations
+(\Cref{sec:spearman}) serve as a robustness check that does not impose
+linearity or equal-interval assumptions.
+
+\subsubsection{Cohen's \textit{d} Effect Size}
+\label{sec:cohens-d}
+
+To quantify the practical magnitude of any difference in playoff advancement
+between offense-dominant and defense-dominant teams, Cohen's $d$ is computed
+as the standardized mean difference:
+
+\begin{equation}
+  \label{eq:cohens-d}
+  d = \frac{\bar{x}_{\mathrm{off}} - \bar{x}_{\mathrm{def}}}{s_p},
+  \qquad
+  s_p = \sqrt{\frac{(n_{\mathrm{def}} - 1)\,s_{\mathrm{def}}^2
+                    + (n_{\mathrm{off}} - 1)\,s_{\mathrm{off}}^2}
+                   {n_{\mathrm{def}} + n_{\mathrm{off}} - 2}},
+\end{equation}
+
+where $\bar{x}_{\mathrm{def}}$ and $\bar{x}_{\mathrm{off}}$ are the mean
+\texttt{playoff\_wins} for defense-dominant
+($\texttt{offense\_share} < -0.3$) and offense-dominant
+($\texttt{offense\_share} > +0.3$) team-seasons across all 224 observations, and
+$s_p$ is the pooled standard deviation \parencite{cohen1988statisticalpower}.
+Non-playoff team-seasons receive \texttt{playoff\_wins} $= 0$, so the effect
+size captures both the selection effect (making the playoffs) and the
+advancement effect (winning once there).
+
+The conventional thresholds proposed by \textcite{cohen1988statisticalpower}
+are used for interpretation: $|d| < 0.2$ is negligible, $|d| \approx 0.2$
+is small, $|d| \approx 0.5$ is medium, and $|d| \approx 0.8$ or larger is
+large. A positive $d$ indicates that offense-dominant teams win more playoff
+games on average; a negative $d$ would indicate defense-dominant teams
+perform better. The effect size
+is reported alongside the raw means and standard deviations to support
+substantive interpretation independent of statistical significance.
+
+% ============================================================
+\subsection{Quartile Analysis}
+\label{sec:quartile-analysis}
+% ============================================================
+
+As a non-parametric complement to the regression analyses, team-seasons are
+partitioned into four equal-sized groups (quartiles) by \texttt{offense\_share}.
+Quartile one (Q1) contains the most defense-dominant team-seasons; quartile
+four (Q4) contains the most offense-dominant team-seasons. For each quartile,
+the analysis reports the playoff appearance rate, the mean \texttt{playoff\_wins}
+conditional on playoff qualification, and the Super Bowl win count.
+
+The quartile design is preferred over binary splits for two reasons. First, it
+is non-parametric: it does not assume a particular functional form for the
+relationship between \texttt{offense\_share} and postseason outcomes, and it
+does not require the analyst to specify a threshold separating
+``offense-dominant'' from ``defense-dominant'' before seeing the data. Second,
+equal-sized groups ensure that each quartile contributes equally to the
+descriptive picture, rather than allowing an extreme but sparsely populated
+tail to dominate the comparison. If the ``defense wins championships'' narrative
+is supported, the playoff appearance rate and mean playoff wins should increase
+monotonically from Q4 (most offense-dominant) to Q1 (most defense-dominant).
+
+% ============================================================
+\subsection{Era Comparison}
+\label{sec:era-comparison}
+% ============================================================
+
+The study window spans two distinct regulatory eras. The 2018--2019 period
+comprises two seasons under the six-team postseason bracket, in which two
+first-round byes per conference were awarded to the top two seeds. The
+expanded seven-team bracket was adopted from the 2020 season onward, granting
+only the top seed per conference a bye. For the era comparison, the sample is
+split at the 2020--2021 boundary (2018--2020 vs.\ 2021--2024) to create
+sub-samples of roughly comparable size, noting that the 2020 season already
+operated under the expanded bracket. The bracket expansion increases the
+number of playoff games played per conference by one and modestly lowers the
+average seeding quality of the playoff field.
+
+Beyond the structural bracket change, the 2021--2024 era has seen an increase
+in rule enforcement protecting quarterbacks and receivers, which some
+commentators argue has favored offensive production \parencite{barnwell2019passingrevolution,nflscoring2023trends}. Whether this translates
+into a weakening of the ``defense wins championships'' association is an
+empirically testable directional question.
+
+For each era, the Spearman rank correlation between \texttt{offense\_share} and
+\texttt{playoff\_wins} is computed on the respective playoff subsample and
+compared in direction and magnitude. This comparison is explicitly flagged as
+directional and exploratory. The per-era playoff subsamples contain
+approximately 36 team-seasons (2018--2020) and approximately 58 team-seasons
+(2021--2024), sample sizes that are insufficient for formal significance tests
+of the difference between two Spearman coefficients. The era comparison is
+therefore interpreted as a descriptive pattern and a motivation for future
+work with longer time horizons, not as a definitive finding about trend.
+
+% ============================================================
+\subsection{Quadrant Analysis}
+\label{sec:quadrant-analysis}
+% ============================================================
+
+The regression and quartile analyses treat offensive and defensive strength as
+exchangeable inputs to the same scalar \texttt{offense\_share} index. A
+complementary analysis separates the two dimensions explicitly by constructing
+a $2 \times 2$ quadrant matrix. This approach is restricted to the top 25\%
+of team-seasons by \texttt{gds\_per\_game} -- those with demonstrably elite
+overall quality -- to remove the confound that poor performance in both phases
+simultaneously drives down the entire distribution.
+
+Within this elite subsample, teams are median-split on offensive and defensive
+\xvoa{}/game separately, creating four quadrants:
+
+\begin{table}[htbp]
+  \centering
+  \caption[Quadrant classification for elite team-seasons]{Quadrant classification for elite team-seasons (top-quartile
+           \gds{} per game). The median split is applied separately within
+           the elite subsample for offensive and defensive \xvoa{} per game.
+           Each cell reports the number of team-seasons, playoff appearance
+           rate, and mean playoff wins.}
+  \label{tab:quadrants}
+  \begin{adjustbox}{max width=\textwidth}
+  \begin{tabular}{lcc}
+    \toprule
+    & \textbf{Above-median defense} & \textbf{Below-median defense} \\
+    \midrule
+    \textbf{Above-median offense}
+      & \textit{Elite Both} (Q-BO)
+      & \textit{Offense Only} (Q-OO) \\[4pt]
+    \textbf{Below-median offense}
+      & \textit{Defense Only} (Q-DO)
+      & \textit{Neither} (Q-NN) \\
+    \bottomrule
+  \end{tabular}
+  \end{adjustbox}
+\end{table}
+
+The \textit{Elite Both} quadrant (Q-BO) contains elite team-seasons with
+above-median performance in both phases; \textit{Offense Only} (Q-OO) contains
+those with strong offense but weaker defense; \textit{Defense Only} (Q-DO)
+contains those with strong defense but weaker offense; and \textit{Neither}
+(Q-NN) contains elite teams whose quality derives more from special teams and
+scheduling than from either major phase.
+
+The quadrant analysis tests a more nuanced version of the championship claim.
+If the ``defense wins championships'' narrative is correct in its strong form,
+Q-DO should generate more Super Bowl winners than Q-OO among elite team-seasons.
+If the narrative is incorrect and offensive excellence dominates, Q-OO should
+generate more. If both phases are equally important at the elite level, the
+champion rate should be similar across Q-BO, Q-OO, and Q-DO, with Q-NN
+contributing the fewest. The population of 56 elite team-seasons (top-quartile
+out of 224) is small enough that stochastic variation will be substantial;
+results are therefore interpreted descriptively alongside the full-sample
+statistical tests.
+
+% ============================================================
+\subsection{Sample Size and Statistical Power}
+\label{sec:sample-size}
+% ============================================================
+
+The analysis is conducted on a sample of 224 team-seasons (32 teams across
+7 seasons, 2018--2024). The playoff subsample comprises approximately 94
+team-seasons (roughly 13--14 per season, accounting for bye-team inclusion
+and the bracket expansion in 2020). The Super Bowl winner subsample contains
+exactly 7 observations, one per season.
+
+These sample sizes have different implications for the statistical power of each
+procedure. The Pearson and Spearman correlations involving all 224 team-seasons
+or the 94-season playoff subsample are reasonably powered to detect medium to
+large effect sizes. Using the approximation for Pearson correlation power
+\parencite{cohen1988statisticalpower}, a sample of $n = 94$ provides
+approximately 80\% power to detect a true population correlation of
+$|\rho| \approx 0.29$ at $\alpha = 0.05$ (two-tailed). For $n = 224$ the
+corresponding detectable correlation drops to $|\rho| \approx 0.19$.
+Effect sizes below these thresholds may exist but will be statistically
+undetectable in the present data.
+
+The binary logistic regression (\Cref{sec:logistic}) is the most power-limited
+procedure. With 7 Super Bowl winners and approximately 87 non-winners in the
+playoff subsample, the effective event rate is approximately 7\%. Standard
+guidelines for logistic regression suggest a minimum of 10--15 events per
+predictor variable \parencite{hosmer2013logistic}; the present model uses 2
+predictors, implying a minimum of 20 events for reliable coefficient estimation.
+The observed 7 events fall well below this threshold. The logistic regression
+results are therefore interpreted as directional and exploratory. Coefficient
+magnitudes and signs are reported, but $p$-values and confidence intervals are
+treated as approximate given the small event count, and the model is used
+primarily to examine whether defensive \xvoa{} has higher discriminative
+association with the championship outcome than offensive \xvoa{}.
+
+The Cohen's $d$ comparison between offense-dominant and defense-dominant
+playoff teams depends on the number of team-seasons satisfying the threshold
+criteria ($|\texttt{offense\_share}| > 0.3$). The approximately equal split
+of the playoff sample across the offense-share spectrum yields group sizes in
+the range of 20--30 per extreme, sufficient to detect a medium effect
+($d \approx 0.5$) with approximately 60--70\% power at $\alpha = 0.05$.
+This is below the conventional 80\% threshold, which means that a true medium
+effect may go undetected. All effect sizes are therefore reported regardless
+of statistical significance, with the understanding that the present study is
+better characterized as exploratory-confirmatory in nature than as a
+definitive hypothesis test.
+
+The era comparison (\Cref{sec:era-comparison}) involves the smallest per-era
+subsamples (approximately 36 and 58 playoff team-seasons) and is explicitly
+treated as exploratory throughout. No formal inference about era differences
+is drawn from these subsamples; the comparison is presented to orient future
+work with longer data windows.
+
+Across all analyses, statistical significance is assessed at $\alpha = 0.05$.
+Spearman and Pearson $p$-values are reported two-tailed. The five
+statistical procedures test different operationalizations of the same
+directional hypothesis rather than strictly independent hypotheses: they are
+designed to converge or diverge as a coherent body of evidence, not to control a
+family-wise error rate across independent discoveries. The inferential
+conclusion rests on the consistency and direction of results across all
+procedures, not on any single $p$-value crossing a threshold. Nevertheless, as
+a robustness check, Holm--Bonferroni-adjusted $p$-values are reported alongside
+unadjusted values in the results (\Cref{sec:archetype-findings}). Under this
+correction, all five primary tests remain significant at $\alpha = 0.05$,
+confirming that the conclusions are not an artifact of multiple testing.

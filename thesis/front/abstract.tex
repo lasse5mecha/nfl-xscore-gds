@@ -1,0 +1,13 @@
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+This paper develops \textit{xScore}, a calibrated multinomial XGBoost model that predicts drive outcomes in the National Football League (NFL), and uses it to construct Game Deserved Score (GDS), a novel team evaluation framework that decomposes match results into offensive, defensive, and special-teams contributions. Applied to 224 team-seasons across the 2018--2024 period, the framework enables the first rigorous, play-level empirical test of the widely cited ``defense wins championships'' hypothesis.
+
+The xScore model classifies each play's drive-level outcome into four categories (touchdown, field goal, turnover, punt/other) using situational game-state features, achieving a multiclass Brier score of 0.1562 with stable out-of-distribution generalization to pre-2018 seasons. Per-class isotonic calibration ensures that predicted probabilities correspond to observed frequencies across the full probability range.
+
+GDS translates calibrated xScore probabilities into expected points above or below a league-average baseline, attributing each drive's value to the responsible unit. The resulting per-game offensive and defensive \textit{xVOA} (expected Value Over Average) metrics explain 46.4\% and 14.2\% of win-percentage variance respectively -- a $3.3 : 1$ ratio favoring offense.
+
+Archetype analysis reveals that offense-dominant teams are systematically advantaged at every stage of the postseason hierarchy: all seven Super Bowl winners in the study window are offense-dominant, and no defense-dominant team won more than a single playoff game across seven seasons and 94 playoff appearances. Converging evidence from Spearman correlations, logistic regression, Cohen's $d$, era comparisons, and quadrant analysis consistently rejects all three formulations of the defensive championship hypothesis.
+
+\vspace{1em}
+\noindent\textbf{Keywords:} NFL analytics, expected points, gradient boosted trees, calibration, team evaluation, playoff prediction, sports analytics

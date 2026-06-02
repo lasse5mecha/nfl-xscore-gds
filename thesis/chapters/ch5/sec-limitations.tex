@@ -1,0 +1,198 @@
+\section{Limitations}
+\label{sec:limitations}
+
+The findings of this paper are subject to several methodological limitations
+that constrain the strength of the conclusions drawn. This section identifies
+the most consequential threats to validity, explains their implications for the
+central arguments, and suggests how future work might address them.
+
+% ============================================================
+\subsection{Correlation and Causation}
+\label{sec:lim-causation}
+% ============================================================
+
+The analytical framework employed throughout this paper documents statistical
+associations between offensive and defensive quality metrics and competitive
+outcomes. It does not establish causal relationships. The finding that offensive
+\xvoa{} explains more variance in winning than defensive \xvoa{} demonstrates
+that offensive execution covaries more strongly with success, but it cannot prove
+that investing in offensive talent \emph{causes} teams to win more games. The
+distinction matters because resource allocation decisions -- the strategic
+implications discussed in \Cref{sec:implications} -- require causal reasoning,
+yet the evidence base is purely observational.
+
+A specific concern is reverse causation operating through game state. Teams that
+establish early leads often shift to more conservative play-calling: running the
+ball to consume clock, avoiding aggressive downfield passing, and accepting
+shorter drives that reduce turnover risk. This behavioral shift means that
+teams already winning may generate different \xscore{} profiles not because
+their offensive quality is superior, but because their game situation permits
+lower-variance strategy. The \gds{} framework mitigates this partially by
+measuring per-drive execution quality rather than volume -- a team running
+conservative drives still has each drive evaluated against the expected scoring
+probability from its starting field position. However, this mitigation is
+incomplete. If conservative play-calling systematically produces drives that
+exceed expectation (for example, by avoiding turnovers that the model expects at
+league-average rates), then \xvoa{} values for leading teams may be inflated.
+A specific mediation concern -- that defensive quality generates favorable
+starting field position which inflates offensive \xvoa{} -- was directly tested
+in \Cref{sec:mediation-findings}. The mediation analysis found that only 9.2\%
+of the offensive \xvoa{}-to-wins association is attributable to
+defense-generated field position, with 90.8\% of the offensive value operating
+independently. This result substantially mitigates the indirect-pathway
+version of the causal concern, though it does not resolve the broader issue
+of reverse causation through game state.
+
+A randomized experiment -- randomly assigning offensive and defensive talent to
+teams -- is impossible in professional sport. Observational data can establish
+the pattern of association, as this paper has done, but the causal interpretation
+remains an inference rather than a demonstration.
+
+% ============================================================
+\subsection{Small Championship Sample}
+\label{sec:lim-sample}
+% ============================================================
+
+The logistic regression analysis presented in \Cref{sec:logistic-results}
+attempts to model the probability of winning the Super Bowl as a function of
+offensive and defensive \xvoa{}. The fundamental constraint is that the
+2018--2024 study window contains exactly seven Super Bowl winners across seven
+seasons. With only seven positive events and two predictors, the
+events-per-variable (EPV) ratio is 3.5, well below the standard recommendation
+of 10 EPV for logistic regression \parencite{peduzzi1996simulation}. This low EPV
+means that coefficient estimates are unstable, confidence intervals are wide,
+and the model has limited statistical power to detect effects of moderate size.
+
+Although both the offensive ($p = 0.003$) and defensive ($p = 0.027$)
+coefficients achieve statistical significance in the current model, the low EPV
+means that these estimates carry substantial uncertainty and should not be
+over-interpreted in terms of their relative magnitudes. The wider standard error
+on the defensive coefficient (SE $= 0.178$ vs $0.126$ for offense) reflects the
+inherent imprecision of a seven-event logistic model. This limitation is
+structural rather than methodological -- no analytical choice can increase the
+number of Super Bowl winners per season. The pre-registered hypothesis tests
+and descriptive analyses that form the primary evidential basis of this paper
+do not suffer from this constraint to the same degree, as they operate on the
+full 94 playoff team-seasons rather than only the 7 champions. Nevertheless,
+any claim about championship-specific effects must be understood as provisional
+until more seasons of data become available.
+
+% ============================================================
+\subsection{Schedule Strength}
+\label{sec:lim-opponent}
+% ============================================================
+
+The \gds{} framework measures raw execution quality: how much value a team's
+offense or defense generates relative to league-average expected outcomes, without
+adjusting for the quality of opposition faced at the drive level. A defense
+achieving high \xvoa{} against a schedule of below-average offenses is rated
+identically to one achieving the same \xvoa{} against elite offenses. This
+absence of drive-level opponent adjustment introduces potential bias if schedule
+strength correlates systematically with team archetype.
+
+To assess whether this limitation materially affects the archetype findings, I
+constructed a leave-one-out opponent-strength variable and included it as a
+control in the OLS regression predicting playoff wins
+(\Cref{sec:statistical-confirmation}). The opponent-strength coefficient was
+effectively zero ($-0.001$, $p = 0.985$), and neither the offensive nor
+defensive \xvoa{} coefficients changed meaningfully when schedule strength was
+controlled. This null result provides empirical reassurance that the documented
+offensive advantage is not an artifact of schedule imbalance.
+
+Nevertheless, a more principled drive-level opponent adjustment -- in which each
+drive's expected baseline accounts for the opposing unit's quality -- represents
+a natural extension. Such an adjustment would require an iterative estimation
+procedure (since each team's quality depends on the quality of teams it has
+faced, which in turn depends on the quality of teams \emph{they} have faced),
+analogous to the iterative strength-of-schedule corrections used in Elo rating
+systems. This extension was beyond the scope of the present paper but would
+further strengthen the internal validity of the \gds{} decomposition at the
+drive level, even though the season-level robustness check suggests the bias is
+negligible.
+
+% ============================================================
+\subsection{Data Limitations}
+\label{sec:lim-data}
+% ============================================================
+
+The \texttt{nflfastR} play-by-play dataset provides comprehensive
+situational information (down, distance, field position, score
+differential, time remaining) but lacks several categories of data that
+would enrich the analysis.
+Player tracking data (Next Gen Stats), which records the position and velocity
+of all 22 players at 10~Hz, is not publicly available for research use. Without
+tracking data, the model cannot distinguish between value generated by scheme
+design and value generated by individual talent execution. A team might achieve
+high offensive \xvoa{} because its offensive coordinator designs plays that
+create favorable situations, or because its quarterback makes exceptional
+decisions under pressure, or both -- the current framework cannot disaggregate
+these contributions.
+
+Additionally, personnel groupings (e.g., 11~personnel, 12~personnel), pre-snap
+alignment information, and defensive coverage classifications are absent from
+the modeling features. Weather conditions, player injuries, and weekly roster
+availability -- all of which influence drive outcomes -- are not incorporated. The
+practical effect is that \xscore{} predictions reflect league-average
+relationships between situational variables and scoring probability, without
+conditioning on the specific personnel or environmental context of each drive.
+This omission likely adds noise to drive-level predictions but should not
+introduce systematic bias at the season level, provided that personnel and
+weather effects are approximately symmetrically distributed across team
+archetypes.
+
+% ============================================================
+\subsection{Temporal Confound: The Rules Environment}
+\label{sec:lim-temporal}
+% ============================================================
+
+The 2018--2024 study window coincides with an NFL rules environment that
+explicitly favors offensive production. The 2018 season introduced expanded
+roughing-the-passer protections \parencite{pereira2018roughing}, and subsequent seasons have seen increased
+enforcement of defensive holding, illegal contact, and player safety rules that
+limit the physicality available to defensive players. These rule changes have
+contributed to historically high passing efficiency, scoring rates, and offensive
+production across the league during the study period. The observed offensive
+advantage in predicting success may therefore be partially an artifact of the
+regulatory environment rather than a fundamental structural truth about the
+sport of American football.
+
+If future rule changes were to rebalance the equilibrium between offense
+and defense -- for example, by permitting more physical coverage techniques
+or reducing protections for quarterbacks outside the pocket -- the magnitude
+of the offensive advantage documented here might attenuate. The
+out-of-distribution validation conducted on 2014--2017 data
+(\Cref{sec:data}) demonstrates that the \xscore{} model generalizes well
+to a moderately different rules environment, providing confidence in the
+model's technical validity. However, the archetype analysis
+and hypothesis tests were not extended to pre-2018 seasons, meaning that the
+question of whether offense has \emph{always} been more important or whether
+this is a modern phenomenon remains unanswered. A longitudinal extension
+spanning multiple regulatory eras (for example, 2002--2024) would be required to
+disentangle the structural contribution of offense from the rule-induced
+amplification of offensive metrics.
+
+% ============================================================
+\subsection{Special Teams as a Residual Quantity}
+\label{sec:lim-special-teams}
+% ============================================================
+
+The \gds{} framework decomposes team quality into three components:
+offensive \xvoa{}, defensive \xvoa{}, and a special teams value term
+(ST\_Value). As described in \Cref{sec:gds}, the special teams component
+measures field-position deviations from transition-type baselines: for each
+drive, ST\_Value equals the starting \xscore{} xEP minus the league-average xEP
+for drives of the same transition type (e.g., post-kickoff, post-punt). This
+construction captures genuine special teams impact on field position (kick
+returns, punt coverage) but does not independently model special teams scoring
+events. It also conflates any systematic bias in the \xscore{} baseline
+predictions with special teams value, since both enter through the starting
+xEP term. In consequence, the magnitude and
+variability of ST\_Value cannot be interpreted purely as a measure of special
+teams quality. A dedicated special teams probability model -- estimating expected
+points from kick-off situations, punt returns, and field goal attempts
+independently -- would provide a more principled decomposition. Such a model was
+beyond the scope of this paper, and the residual approach was judged acceptable
+given that special teams contribute a relatively small share of total game value
+in the modern NFL. Nevertheless, any future extension of the \gds{} framework
+should prioritize replacing the residual with an independently estimated special
+teams component.

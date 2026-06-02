@@ -1,0 +1,188 @@
+\section{Comparison to Existing Work}
+\label{sec:existing-work}
+
+% ============================================================
+\subsection{GDS versus EPA-Based Frameworks}
+\label{sec:gds-vs-epa}
+% ============================================================
+
+The most widely cited team quality metric in professional NFL analytics is
+Football Outsiders' Defense-adjusted Value Over Average (DVOA). Like the \gds{}
+framework developed in this paper (\Cref{sec:gds}), DVOA decomposes team
+performance into offensive, defensive, and special teams components, enabling
+analysts to identify which phase of the game drives a team's overall quality.
+Both approaches share the fundamental insight that a single aggregate number
+obscures the strategic composition of team strength, and that meaningful
+evaluation requires examining the constituent parts. Qualitatively, the two
+frameworks would identify the same teams as elite -- both would recognize the
+2023 San Francisco 49ers as a balanced elite team and the 2024 Baltimore
+Ravens as an offensively dominant contender -- and both would reach similar
+conclusions regarding the primacy of offensive quality in championship
+contention.
+
+The differences, however, are substantial and methodologically motivated. DVOA
+operates at the play level, assigning value to each individual snap based on
+Expected Points Added (EPA). \gds{} operates at the drive level, using
+expected points derived from a multinomial outcome model as its currency of
+evaluation (\Cref{sec:xscore}). This
+distinction is not merely one of granularity; it reflects a different
+theoretical commitment about the fundamental unit of football scoring
+opportunity. A single explosive play -- a broken coverage resulting in a
+75-yard touchdown, or a fumble on the first snap -- can dramatically distort
+play-level EPA totals for a game. Drive-level aggregation smooths this noise
+by asking whether the overall sequence of plays produced a scoring outcome
+that exceeded or fell short of expectations given the starting field position.
+In this sense, \gds{} captures sustained execution quality rather than the
+sum of isolated individual events, providing a measure more reflective of
+systematic team capability.
+
+A second critical distinction concerns transparency and reproducibility. DVOA
+is proprietary \parencite{schatz2005dvoa}: neither the precise opponent adjustments, the weighting
+schemes, nor the underlying data transformations are publicly documented in
+sufficient detail to permit independent replication. Researchers citing DVOA
+must treat it as a black box, accepting its outputs on trust. The \gds{}
+framework, by contrast, is fully open-source. The \xscore{} model, the
+isotonic calibration procedure, the \xvoa{} decomposition, and the archetype
+classification are all implemented in Python using publicly available
+\texttt{nflfastR} data \parencite{carl2021nflfastr}, and the complete codebase
+accompanies this paper. Any researcher can replicate, extend, or critique
+the results. In an era where reproducibility concerns pervade quantitative
+social science, this transparency represents a meaningful contribution.
+
+The primary advantage DVOA retains is opponent adjustment: each play's value
+is scaled by the quality of the opposing defense or offense, creating a
+measure that accounts for strength of schedule. \gds{} does not incorporate
+such an adjustment (\Cref{sec:limitations}), meaning that a team accumulating
+\xvoa{} against weak opponents is not penalized relative to one facing elite
+competition. Over a 17-game regular season, strength-of-schedule effects
+partially average out, but this remains a limitation relative to DVOA's
+approach. Future extensions of the framework could incorporate opponent
+adjustment while preserving the drive-level, open-source character that
+distinguishes \gds{}.
+
+% ============================================================
+\subsection{Comparison to Robst, VanGilder, and Berri (2011)}
+\label{sec:comparison-robst}
+% ============================================================
+
+\textcite{robst2011defense} represents the most direct academic predecessor to
+the present investigation. Their study examined whether defensive metrics
+predict NFL playoff success, concluding that offensive statistics are
+substantially stronger predictors and that the ``defense wins championships''
+maxim lacks empirical support. The directional conclusion of this paper is
+entirely consistent with their finding: across all five statistical procedures
+employed in \Cref{ch:results}, offensive quality dominates defensive quality as
+a predictor of postseason success.
+
+The methodological advance offered by \gds{} over Robst et al.'s approach is
+considerable, however. Their analysis relied on traditional box-score statistics
+ -- total yards gained, total yards allowed, points scored, points allowed -- that
+conflate quality with volume and fail to account for game context. A team
+protecting a large lead in the fourth quarter will frequently allow ``garbage
+time'' yards and points that inflate its defensive statistics without reflecting
+genuine defensive weakness. Similarly, a team that plays with a lead controls
+possession through running, suppressing its own passing yardage totals without
+implying offensive inadequacy. The \xscore{} model addresses this directly:
+by conditioning drive-outcome probabilities on field position, down, distance,
+score differential, and time remaining (\Cref{sec:xscore}), the \xvoa{} metric
+captures performance relative to a calibrated baseline that accounts for game
+state. A team allowing a late touchdown when trailing by four scores receives
+minimal defensive penalty, because the expected scoring probability was already
+elevated by the situation. This context-sensitivity represents a substantial
+refinement over raw box-score approaches and provides a more rigorous
+measurement basis for the offensive primacy conclusion.
+
+% ============================================================
+\subsection{Novel Contributions}
+\label{sec:novel-contributions}
+% ============================================================
+
+Four contributions distinguish this paper from existing work on NFL team
+evaluation and the ``defense wins championships'' debate.
+
+First, \gds{} is, to the author's knowledge, the first fully open-source,
+reproducible team quality metric with an explicit three-component decomposition
+into offensive, defensive, and special teams value. While
+\textcite{yurko2019nflwar} developed the open-source \texttt{nflWAR} framework
+for player-level EPA decomposition, their focus was individual attribution
+rather than team-level quality measurement. The team-level metrics most commonly
+used by practitioners -- DVOA, ESPN's QBR-based team ratings, and Pro Football
+Focus grades -- are uniformly proprietary. By providing a transparent,
+replicable alternative, this paper enables other researchers to build upon,
+critique, or extend the framework without licensing barriers.
+
+Second, the choice of drive-level probability modeling rather than play-level
+EPA represents a theoretically motivated departure from the dominant paradigm
+in football analytics. The drive is the fundamental unit of scoring opportunity
+in American football: a team receives possession, executes a sequence of plays,
+and either scores or does not. The \xscore{} model respects this structure by
+predicting the probability of scoring a touchdown on each drive given its
+initial conditions, then measuring whether the observed outcome exceeded or
+fell short of that expectation. This approach avoids the well-documented issues
+with play-level EPA, including sensitivity to individual plays, instability in
+small samples, and the arbitrary allocation of value between consecutive plays
+in a sequence \parencite{yurko2019nflwar}.
+
+Third, this paper provides the first systematic, multi-method test of the
+``defense wins championships'' hypothesis using a calibrated expected-value
+framework. Previous investigations relied on either traditional statistics
+\parencite{robst2011defense} or purely predictive models
+\parencite{lock2014randomforests} without an explicit probability baseline.
+The combination of 224 team-seasons across seven seasons (2018--2024), five
+distinct statistical procedures (Spearman rank correlation, Pearson
+correlation with $r^2$ decomposition, binary logistic regression, OLS
+regression, and Cohen's $d$), and
+pre-registered directional hypotheses provides considerably stronger evidence
+than any single prior study. The convergent rejection across all methods
+strengthens the inferential warrant beyond what any individual test could
+provide.
+
+Fourth, the ``competent defense threshold'' concept -- the finding that
+defensive quality operates as a necessary but insufficient condition for
+championship success, with diminishing returns beyond a moderate level -- has
+not been previously formalized in the academic literature. This nuanced
+conclusion moves beyond the binary framing of ``offense versus defense'' to
+articulate a strategic principle: elite teams invest in defensive competence
+to avoid catastrophic vulnerability, but allocate marginal resources toward
+offensive excellence where the return on investment is substantially higher.
+
+% ============================================================
+\subsection{Consistency with Broader Literature}
+\label{sec:consistency-literature}
+% ============================================================
+
+The offensive primacy finding is consistent with a growing body of evidence
+across multiple methodological traditions. \textcite{lock2014randomforests}
+employed random forests to predict NFL game outcomes and found that offensive
+variables -- particularly passing efficiency metrics -- were consistently more
+predictive of wins than defensive variables. Their machine learning approach,
+operating at a different level of analysis and using a different modeling
+strategy, reached the same directional conclusion as the present work,
+suggesting that the finding is robust to methodological choices rather than
+an artifact of any particular analytic framework.
+
+\textcite{massey2013loserscurse} approached the question from a labor
+economics perspective, demonstrating that NFL teams systematically overvalue
+early draft picks used on defensive players. Their ``Loser's Curse'' finding
+implies a market-level recognition that defensive talent is overpriced
+relative to its contribution to winning -- a conclusion that aligns precisely
+with the empirical finding that defensive \xvoa{} explains less than half the
+variance in winning that offensive \xvoa{} does. If defensive quality truly
+drove championships, one would expect the market to price defensive talent
+at a premium reflecting that value; instead, the observed overvaluation
+suggests that decision-makers are paying for a narrative (``defense wins
+championships'') rather than a statistical reality.
+
+More broadly, the conceptual framework of using expected scoring models to
+evaluate team quality extends the approach pioneered by
+\textcite{rathke2017expectedgoals} in association football. Rathke's expected
+goals (xG) model demonstrated that comparing observed goals to
+probability-based expectations reveals systematic over- and under-performance
+attributable to team quality rather than luck. The \xscore{} model applies
+this same logic to American football drives: observed touchdowns minus
+expected touchdowns (i.e., \xvoa{}) isolates the quality signal from
+situational noise. The successful application across sports demonstrates
+the portability of probability-based performance measurement frameworks and
+suggests that the drive-level approach developed here could be adapted to
+other invasion sports where possession sequences culminate in discrete
+scoring events.

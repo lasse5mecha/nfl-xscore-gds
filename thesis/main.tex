@@ -1,0 +1,60 @@
+\pdfoutput=1
+\documentclass[12pt,a4paper]{report}
+\input{preamble}
+
+\title{xScore: A Machine Learning Framework for Evaluating NFL Team Performance and Playoff Success}
+\author{Lasse Mecha}
+\date{2026}
+
+\begin{document}
+
+\maketitle
+
+% ---- Front Matter ----
+\input{front/abstract}
+\input{front/abbreviations}
+
+\tableofcontents
+\listoffigures
+\listoftables
+\newpage
+
+% Chapter 1: Introduction
+\input{chapters/ch1-introduction}
+
+% Chapter 2: Literature Review
+\input{chapters/ch2-literature}
+
+% Chapter 3: Methodology
+\input{chapters/ch3-methodology}
+
+% Chapter 4: Results
+\input{chapters/ch4-results}
+
+% Chapter 5: Discussion
+\input{chapters/ch5-discussion}
+
+% Chapter 6: Conclusion
+\input{chapters/ch6-conclusion}
+
+% ---- Data and Code Availability ----
+\chapter*{Data and Code Availability}
+\addcontentsline{toc}{chapter}{Data and Code Availability}
+
+All play-by-play data used in this paper are publicly available via the
+\texttt{nflfastR} package \parencite{carl2021nflfastr}, which provides
+standardized access to NFL play-by-play records from 1999 to the present.
+The complete analytical codebase -- including model training, isotonic
+calibration, GDS computation, archetype classification, statistical testing,
+and figure generation -- is available at:
+
+\begin{center}
+\url{https://github.com/lasse5mecha/nfl-xscore-gds}
+\end{center}
+
+\noindent All analyses were conducted in Python~3.11 using \texttt{scikit-learn},
+\texttt{XGBoost}, \texttt{pandas}, \texttt{scipy}, and \texttt{matplotlib}.
+
+\printbibliography[heading=bibintoc]
+
+\end{document}

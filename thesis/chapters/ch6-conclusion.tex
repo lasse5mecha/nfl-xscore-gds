@@ -1,0 +1,64 @@
+\chapter{Conclusion}
+\label{ch:conclusion}
+
+This chapter summarizes the contributions of this paper, answers the three research questions posed in \Cref{ch:introduction}, identifies directions for future research, and offers closing remarks on the implications of the findings for both the academic literature and professional practice.
+
+\section{Summary of Contributions}
+\label{sec:contributions-summary}
+
+This paper set out to answer a question that sounds straightforward but carries enormous financial stakes: does defensive quality predict championship success in the National Football League more strongly than offensive quality? The question is operationalized through the widely cited heuristic ``defense wins championships,'' which has guided roster construction philosophy, draft strategy, and billions of dollars in salary cap allocation for decades. Despite its pervasiveness, the claim had never been subjected to rigorous, multi-method, machine-learning-based testing using modern play-by-play data. I address this absence through a three-stage analytical framework: a calibrated probability model (\xscore{}), a team quality decomposition (\gds{}), and a statistical hypothesis-testing design (archetype analysis).
+
+\subsection{RQ1: Can a Gradient-Boosted Model Accurately Estimate Drive-Level Expected Points from Situational Features Alone?}
+\label{sec:rq1-answer}
+
+Yes. The \xscore{} model  -- a calibrated multinomial XGBoost ensemble trained on 41{,}117 drives from seven NFL seasons (2018--2024)  -- predicts the probability of four mutually exclusive drive outcomes (touchdown, field goal, turnover, punt/other) and converts these into a single expected-points figure. The model achieves a multiclass Brier score of 0.1562 with strong per-class discrimination, confirming that it correctly rank-orders drives by their scoring potential. More critically for downstream use, per-class isotonic calibration ensures that predicted probabilities closely match observed outcome frequencies across the full probability range: drives assigned a 30\% touchdown probability do in fact score touchdowns approximately 30\% of the time. SHAP analysis confirmed that the model's learned feature importances align with domain knowledge: field position dominates, followed by down, with time and score differential contributing context-dependent effects consistent with known NFL game dynamics \parencite{lundberg2017shap}.
+
+The contribution is a novel, open-source, drive-level expected-points model built entirely on publicly available \texttt{nflfastR} data \parencite{carl2021nflfastr}. Unlike play-level EPA models, \xscore{} operates at the natural unit of offensive possession  -- the drive  -- providing a more stable and less noise-sensitive probability baseline. Unlike proprietary models, it is fully reproducible: any researcher can replicate and extend the results using the accompanying codebase.
+
+\subsection{RQ2: Does the Game Deserved Score Framework Validly Capture Which Team ``Deserved'' to Win?}
+\label{sec:rq2-answer}
+
+Yes. The \gds{} framework translates \xscore{} predictions into a three-component team quality metric  -- offensive expected value over average (Off\_\xvoa{}), defensive expected value over average (Def\_\xvoa{}), and special teams value (ST\_Value)  -- that satisfies multiple empirical validation criteria. Teams with higher \gds{} win their games at rates well above chance, seasonal component scores exhibit temporal stability consistent with genuine team quality rather than noise, and the decomposition correctly identifies teams that the broader football community recognizes as offensively or defensively elite.
+
+What results is the first fully transparent, reproducible team quality metric with an explicit three-component decomposition into offensive, defensive, and special teams value  -- addressing limitations that have constrained each of the existing alternatives (EPA's lack of structured decomposition, DVOA's opacity, PFF's subjectivity). By expressing all components on a common scale (expected points above average), \gds{} enables direct comparison of offensive and defensive contributions to team success  -- precisely the comparison required to test the championship hypothesis.
+
+\subsection{RQ3: Is Defensive Dominance Associated with Greater Playoff Success than Offensive Dominance in the Modern NFL?}
+\label{sec:rq3-answer}
+
+No. Across all five statistical methods employed  -- Spearman rank correlation, Pearson correlation with $r^2$ decomposition, binary logistic regression, OLS regression, and effect-size estimation via Cohen's \emph{d}  -- offensive dominance emerges as a substantially stronger predictor of playoff success than defensive dominance. The finding is consistent across 224 team-seasons spanning the 2018--2024 NFL seasons and robust to methodological choice: no single test drives the conclusion, and the convergent pattern across five independent analytical frameworks strengthens the inferential warrant beyond what any individual procedure could provide.
+
+Offense-dominant teams reach the playoffs at higher rates, advance further in the bracket, and win championships more frequently than defense-dominant teams. The offensive \xvoa{} component explains more than three times the variance in season win percentage that defensive \xvoa{} does (a ratio of approximately $3.3 : 1$). The effect sizes are not trivial: the difference in playoff advancement between offense-dominant and defense-dominant archetypes represents a practically meaningful competitive advantage over the multi-season sample.
+
+A nuanced finding emerges alongside the headline result: defensive quality operates as a necessary but insufficient condition for championship success, with diminishing returns beyond a moderate competence threshold (discussed in detail in \Cref{ch:discussion}). The strategic implication is that marginal resources should flow to offense once adequate defensive competence is secured.
+
+
+\section{Directions for Future Research}
+\label{sec:future-research}
+
+\subsection{Player-Level Attribution}
+
+The \gds{} framework operates at the team level: it identifies how much value a team's offense or defense generated above expectation, but does not attribute that value to individual players. A natural extension would decompose team-level Off\_\xvoa{} and Def\_\xvoa{} into player-level contributions, enabling individual valuation on the same scale used for team quality measurement. Such a decomposition would require play-level attribution  -- allocating each drive's outcome across the individual snaps and players involved  -- using techniques analogous to the SHAP framework \parencite{lundberg2017shap} applied to cooperative credit assignment rather than feature importance. This extension would connect the \gds{} tradition to the player-level evaluation framework established by \textcite{yurko2019nflwar}, providing a bridge between team-level strategy questions and individual contract decisions.
+
+\subsection{Positional Value Decomposition}
+
+The present analysis demonstrates that offensive quality predicts playoff success more strongly than defensive quality, but does not distinguish between the sources of offensive value. An important follow-up question is whether the offensive primacy finding is driven by passing efficiency, rushing efficiency, or both. Decomposing offensive \xvoa{} into passing and rushing components  -- by conditioning on play type within drives and separating passing-drive value from rushing-drive value  -- would test whether ``offensive primacy'' is effectively ``quarterback primacy.'' This distinction carries direct implications for draft strategy: if the entire offensive advantage flows through the passing game, then investment in elite quarterbacks and pass-catchers offers higher returns than investment in rushing talent, further sharpening the allocation guidance.
+
+\subsection{Salary Cap Efficiency Analysis}
+
+The most directly actionable extension would match \gds{} component values to positional salary cap expenditure data, which is publicly available through services such as OverTheCap. Regressing positional spending against corresponding \xvoa{} components would quantify the marginal win-value of a cap dollar at each position group, identifying which positions are over- or under-valued by the market relative to their actual contribution to team quality. Combined with the finding that offensive \xvoa{} dominates playoff prediction, such an analysis could identify specific market inefficiencies: positions where spending is high relative to win contribution (suggesting overvaluation driven by the ``defense wins championships'' heuristic) and positions where spending is low relative to win contribution (suggesting exploitable bargains for analytically informed teams) \parencite{borghesi2008allocation, mulholland2019optimizing}.
+
+\subsection{Temporal Extension}
+
+The 2018--2024 sample represents the modern passing-era NFL, and the offensive primacy finding may be specific to this period's rule environment. As additional seasons become available, the archetype analysis can be trivially re-run to monitor whether the finding persists, strengthens, or weakens. If future rule changes were to re-balance the offensive--defensive equilibrium  -- for example, by relaxing contact restrictions or penalizing offensive motion  -- the framework provides the instrumentation to detect such a shift in real time. The open-source design ensures that longitudinal extension requires no methodological reinvention, only the addition of new season data to the existing pipeline.
+
+
+\section{Closing Remarks}
+\label{sec:closing-remarks}
+
+Across seven NFL seasons, five statistical methods, and 224 team-seasons, I find that one of professional football's most deeply held beliefs  -- that defensive quality is the decisive factor in championship success  -- lacks support in modern evidence. Offensive dominance consistently and significantly outpredicts defensive dominance as a determinant of playoff advancement. No single test, season, or metric drives this conclusion; it emerges from convergent evidence across a purpose-built analytical framework.
+
+Reproducibility was a deliberate design choice, not an afterthought. Every model, decomposition step, and statistical test is fully specified in this document and implemented in publicly available code built on open data sources. In a field where the dominant metrics remain proprietary, I hope this transparency provides useful research infrastructure for the broader analytics community.
+
+For front offices operating under the salary cap, the practical implication is straightforward: marginal investment in offensive quality yields markedly higher returns to playoff advancement than equivalent defensive investment. I do not argue that teams should abandon defense  -- the competent defense threshold confirms that adequate defensive quality remains necessary  -- but rather that the allocation question is one of marginal returns. Once defensive competence is secured, additional resources directed toward offense offer the higher expected payoff.
+
+All code and data are open-source and available for replication, critique, and extension. Whether NFL decision-makers act on this evidence, and how quickly competitive dynamics correct the market's current equilibrium, remains to be seen. My aim has been to establish the empirical foundation with the transparency and rigor that a question of this magnitude deserves.

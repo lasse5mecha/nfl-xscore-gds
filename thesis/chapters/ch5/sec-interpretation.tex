@@ -1,0 +1,222 @@
+\section{Interpretation of Findings}
+\label{sec:interpretation}
+
+% ============================================================
+\subsection{The Verdict on ``Defense Wins Championships''}
+\label{sec:verdict}
+% ============================================================
+
+The central empirical question of this paper -- whether defensive dominance is
+the primary pathway to championship success in the modern NFL -- receives an
+unambiguous answer. All three pre-registered hypotheses are rejected, as
+summarized in \Cref{tab:hypothesis-summary}. The data do not support the claim
+that ``defense wins championships'' in any of its testable formulations: defense-dominant
+teams do not win more playoff games than offense-dominant teams (H1 rejected),
+Super Bowl winners are not drawn disproportionately from defense-dominant
+archetypes (H2 rejected), and defensive \xvoa{} does not exhibit a stronger
+association with playoff success than offensive \xvoa{} (H3 rejected). The
+rejection is not marginal or dependent on a particular statistical procedure; it
+is consistent across all five tests, both descriptive partitioning strategies,
+and both era subsamples examined in \Cref{ch:results}. The popular narrative
+that defensive excellence is the defining characteristic of championship teams
+lacks empirical support in the 2018--2024 NFL.
+
+% ============================================================
+\subsection{What the Data Actually Show}
+\label{sec:what-data-show}
+% ============================================================
+
+The evidence against the defensive narrative operates at every analytical level
+employed in this paper. At the correlational level, the Spearman rank
+correlation between offense share and playoff wins is positive and significant
+($\rho = 0.246$, $p = 0.0167$, $n = 94$ playoff teams), directly contradicting
+the directional prediction of the defensive hypothesis (\Cref{sec:spearman-results}).
+The sign is unambiguous: teams whose quality is proportionally more
+offense-driven win more postseason games, not fewer.
+
+At the variance-explained level, the asymmetry is even more pronounced. Offensive
+\xvoa{} per game accounts for 46.4\% of the variance in season win percentage,
+compared to 14.2\% for defensive \xvoa{} -- a ratio of approximately $3.3 : 1$ in
+favor of offense (\Cref{sec:pearson-results}). This finding means that if one
+were forced to evaluate a team's competitive quality using only one side of the
+ball, offense would provide more than three times as much information as defense.
+The result is not an artifact of the \gds{} framework's construction; it reflects
+the empirical reality that offensive execution varies more meaningfully across
+teams and is more strongly coupled to winning than defensive execution.
+
+At the effect-size level, the practical magnitude of the offensive advantage is
+large. Cohen's $d = 0.672$ [0.574, 0.787] quantifies the standardized
+difference in playoff wins between offense-dominant ($n = 143$) and
+defense-dominant ($n = 29$) team-seasons across the full sample
+(\Cref{sec:cohens-d-results}). In concrete terms, offense-dominant teams
+averaged 0.60 playoff wins per season, compared to 0.00 for
+defense-dominant teams -- no defense-dominant team-season in the study window
+produced any playoff wins at all. This is not a subtle statistical
+distinction but a difference visible to the naked eye of any attentive observer.
+
+At the absolute level, the finding is starker still. Among the 29 defense-dominant
+team-seasons in the study window (offense share $< -0.3$), zero won any
+playoff games, and zero reached the Super Bowl. This null result stands against
+94 total playoff team-seasons across seven seasons -- a sample large enough that
+the complete absence of deep defensive postseason runs cannot reasonably be
+attributed to chance. The logistic regression reinforces this pattern: both
+offensive ($p = 0.003$) and defensive ($p = 0.027$) \xvoa{} are statistically
+significant predictors of Super Bowl victory (\Cref{sec:logistic-results}), but
+all seven Super Bowl champions during the study window had positive offense
+share. The convergence of correlational, variance-explained, effect-size, and
+absolute measures all pointing in the same direction constitutes a robust and
+internally consistent empirical conclusion: offensive dominance is positively
+associated with playoff success at every level of analysis.
+
+% ============================================================
+\subsection{The Nuanced Interpretation: Offense Gets You There, Defense Is the Final Filter}
+\label{sec:nuanced-interpretation}
+% ============================================================
+
+The rejection of the ``defense wins championships'' hypothesis should not be
+misinterpreted as a claim that defense is irrelevant to winning championships.
+The data suggest a more refined structural interpretation: offensive quality is
+the primary engine of playoff qualification and advancement, while competent
+defense serves as a necessary -- but not sufficient -- condition at the championship
+margin. The distinction between being the \emph{driver} of success and being a
+\emph{filter} for the final stage is crucial. Offense determines which teams
+reach the deep postseason; among teams that arrive there, defensive adequacy
+helps determine which survives the final rounds.
+
+Kansas City's 2023 Super Bowl victory illustrates this ``balanced elite''
+archetype. Often characterized in popular discourse as a ``defensive''
+championship, the \gds{} decomposition reveals a more nuanced picture:
+the 2023 Chiefs had a positive offensive \xvoa{} ($+2.641$/game) alongside a
+positive defensive contribution ($+1.896$/game), yielding an offense share of
+$+0.581$ -- the lowest among Super Bowl winners but still firmly
+offense-dominant. The popular narrative that Kansas City won ``because of their
+defense'' is not supported by the expected-point framework; the offense
+generated more absolute value than the defense. What distinguishes this
+championship is that defensive quality contributed more \emph{relative to other
+champions}, not that it was the primary engine of success.
+
+The 2024 Philadelphia Eagles represent the opposite end of the champion
+spectrum (offense $+7.740$/game, defense $+0.639$/game, share $= +0.923$),
+demonstrating that championship teams need not have elite defense if their
+offensive surplus is sufficiently dominant.
+
+The concept of a ``competent defense threshold'' emerges naturally from the
+quadrant analysis (\Cref{sec:quadrant-findings}). Among the top-quartile \gds{}
+teams, the \textit{Offense Only} quadrant produced four Super Bowl winners
+(19.0\% win rate) compared to two for \textit{Defense Only} (9.5\%), despite
+identical sample sizes ($n = 21$). The implication is not that championship
+teams need elite defense; it is that they need non-catastrophic defense. Five of seven champions recorded \emph{negative} defensive
+\xvoa{}/game, meaning their defenses performed below league-average
+expectations at the drive level. A team with a dominant offense and below-average
+defense (Kansas City 2022, with defensive \xvoa{} of $-3.826$/game) can win the
+Super Bowl. A team with elite defense and below-average offense has not done so
+in seven seasons of data. The threshold is asymmetric: the minimum offensive
+requirement for championship contention is substantially higher than the minimum
+defensive requirement.
+
+% ============================================================
+\subsection{Why Offense Matters More: Structural Explanations}
+\label{sec:structural-explanations}
+% ============================================================
+
+The empirical dominance of offense in predicting team success is not a statistical
+curiosity but a reflection of structural features of modern professional American
+football. Three mechanisms help explain why offensive quality is the stronger
+differentiator.
+
+First, offensive production exhibits higher between-team variance than defensive
+production. The component decomposition in \Cref{sec:season-correlation} shows
+that the standard deviation of offensive \xvoa{}/game across team-seasons exceeds
+that of defensive \xvoa{}/game. Higher variance in a predictor variable
+mechanically produces stronger correlations with outcomes, because the variable
+provides more discriminating information between observations. In practical terms,
+the gap between the best and worst offenses in the NFL is wider than the gap
+between the best and worst defenses, which means that offensive quality is a
+more informative signal for distinguishing good teams from poor ones. This
+variance asymmetry is not a measurement artifact; it reflects the structural
+reality that offensive schemes are more diverse, quarterback quality varies more
+dramatically across rosters, and the passing game creates more opportunity for
+separation between teams than the constrained action space of defensive play.
+
+Second, the post-2018 NFL rule environment systematically amplifies offensive
+variance. Increased enforcement of pass interference, roughing-the-passer
+penalties, and restrictions on defensive contact beyond five yards \parencite{pereira2018roughing,barnwell2019passingrevolution} have expanded
+the ceiling for offensive execution while compressing the floor for defensive
+impact. Even the most elite defensive units in the modern game cannot prevent
+completions to the degree that was possible before 2018, because the rules
+constrain the tools available to them. The era analysis in \Cref{sec:era-findings}
+shows a modest increase in the Pearson correlation between offensive \xvoa{} and
+win percentage from 0.621 (2018--2020) to 0.739 (2021--2024), directionally
+consistent with this structural explanation. The defensive Pearson coefficient
+shows no corresponding increase (0.397 to 0.364), suggesting that defensive
+execution has become less -- not more -- predictive of outcomes over time.
+
+Third, offense possesses a structural ceiling advantage. The best offenses can
+score on nearly any opponent in any game; the best defenses cannot prevent all
+scoring against any opponent. This asymmetry creates a fundamental advantage
+for offensive investment: a team that builds an elite offense creates a floor
+of competitiveness that is higher than the floor created by building an elite
+defense, because offensive points are under greater direct control than prevented
+points. Defense is inherently reactive -- it responds to offensive formation,
+personnel, and play-calling -- while offense is proactive, choosing the terms of
+engagement. This proactive-reactive asymmetry means that schematic innovation
+accrues disproportionately to the offensive side, where coordinators can design
+novel concepts that defenses have not yet adapted to, while defensive innovation
+is constrained to adjustments within the opponent's chosen framework.
+
+% ============================================================
+\subsection{Why the Myth Persists}
+\label{sec:myth-persistence}
+% ============================================================
+
+If the empirical evidence so clearly favors offense, why does the belief that
+``defense wins championships'' retain such cultural force in American football
+discourse? Several cognitive and structural factors conspire to sustain the
+narrative despite its empirical weakness.
+
+The most powerful is selection bias in memorable outcomes. The Super Bowls that
+dominate collective memory are disproportionately those with spectacular defensive
+performances: the 2013 Seattle Seahawks dismantling Peyton Manning's record-setting
+offense, the 2015 Denver Broncos winning with an ageing quarterback behind a
+dominant defense. These games are memorable precisely because they are unusual -- a
+defense-dominant team winning the championship is a departure from the base rate,
+which makes it cognitively salient. The seven offense-dominant champions in this
+study's window do not generate comparable narrative drama; a team with the best
+offense winning the Super Bowl is unremarkable, and unremarkable events do not
+anchor in memory. This is a textbook instance of availability bias \parencite{tversky1973availability}: the ease
+with which defensive championship performances come to mind is mistaken for their
+frequency.
+
+The ``denominator problem'' compounds this selection bias. Observers readily
+notice when a defense-dominant team wins a championship because the event is
+visible and celebrated. They do not notice the far more frequent occurrence of
+defense-dominant teams failing to reach the championship stage, because absences
+are invisible. The data in \Cref{sec:archetype-findings} make this absence
+concrete: only six defense-dominant teams (offense share $< 0$) even made the
+playoffs across seven seasons, and none won more than a single game. These quiet
+exits receive no media attention, no retrospective analysis, and no cultural
+narrative. The myth persists in part because the denominator -- the set of
+defense-dominant teams that failed -- is never examined with the same attention
+as the rare numerator event of a defense-dominant champion.
+
+Additionally, the narrative possesses a romantic appeal that transcends evidence.
+The David-versus-Goliath framing -- a tough, physical defensive team outmuscling
+a flashy, high-scoring offense -- resonates with cultural values of effort,
+grit, and determination. It suggests that talent and scheme can be overcome by
+intensity and will, a story more satisfying than the alternative: that the team
+with better players executing a better offensive scheme typically wins. The
+romantic narrative also benefits from confirmation bias in real-time game
+viewing. When a team wins a low-scoring game, observers attribute the result to
+defensive dominance rather than to the more prosaic explanations of opponent
+offensive ineptitude, punting decisions, or game-script effects. Every defensive
+stop is a narrative event; the absence of offensive production that made the stop
+necessary goes unexamined.
+
+The myth is not refuted by pointing to a single game or a single counter-example.
+It is refuted by the systematic pattern across 224 team-seasons and seven
+complete NFL cycles. The contribution of this paper is not to identify one
+exception to the defensive narrative -- exceptions on both sides are easily
+found -- but to demonstrate that the full weight of evidence, examined through
+multiple statistical lenses and a novel measurement framework, consistently and
+strongly favors offensive dominance as the primary pathway to championship
+success in the modern NFL.

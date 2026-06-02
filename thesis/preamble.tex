@@ -1,0 +1,38 @@
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[english]{babel}
+\usepackage{csquotes}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage{xcolor}
+\usepackage[hypertexnames=false]{hyperref}
+\usepackage{cleveref}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{adjustbox}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+
+% APA citations via biblatex
+\usepackage[style=apa,backend=biber,natbib=true]{biblatex}
+\addbibresource{references.bib}
+\DeclareLanguageMapping{english}{english-apa}
+
+% Allow line breaking in \texttt at underscores (only in text mode)
+\let\oldtexttt\texttt
+\renewcommand{\texttt}[1]{\ifmmode\mathtt{#1}\else{\ttfamily\hyphenchar\font=`\-\relax #1}\fi}
+\emergencystretch=1.5em
+\widowpenalty=10000
+\clubpenalty=10000
+
+% Custom commands
+\newcommand{\xscore}{\textit{xScore}}
+\newcommand{\xvoa}{\textit{xVOA}}
+\newcommand{\gds}{\textit{GDS}}
+\newcommand{\prtd}{P(\text{TD}|\text{state})}

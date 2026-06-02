@@ -1,0 +1,258 @@
+\section{Data}
+\label{sec:data}
+
+\subsection{Data Source}
+
+The empirical foundation of this study is the National Football League
+play-by-play dataset compiled and distributed via the \texttt{nflfastR} R
+package \parencite{carl2021nflfastr}. \texttt{nflfastR} parses the official
+NFL Game Center JSON feeds and augments each play record with a rich set of
+derived analytics, most notably Expected Points Added (EPA) and win
+probability estimates \parencite{yurko2019nflwar}. The package has become the
+de facto standard for reproducible NFL research: it covers every regular-season
+and postseason game back to 1999, releases updated data within hours of game
+completion, and its EPA model has been peer-reviewed and independently
+replicated \parencite{yurko2019nflwar}.
+
+Each row in the raw dataset represents a single play and contains, among
+other fields, the game identifier, week, season, possession team, defensive
+team, play type, down, distance to first down, yard line, pre-snap score
+differential, time remaining, and a binary flag indicating whether a
+touchdown was scored on that play. For the purposes of this study, data were
+accessed programmatically via the Python \texttt{nfl\_data\_py} wrapper \parencite{cooper2023nfldatapy}, which
+exposes the same underlying \texttt{nflfastR} parquet files.
+
+\subsection{Scope and Sample}
+
+The primary modeling dataset spans the seven NFL regular seasons from 2018
+through 2024, yielding 224 team-seasons (32 teams $\times$ 7 seasons). After
+play filtering (described in \Cref{sec:play-filtering}), the corpus contains
+241,195 offensive snaps across 41,117 drives.
+
+The lower bound of 2018 was chosen for three reasons. First, the 2018 season
+introduced significant rule changes -- most notably the expansion of the
+roughing-the-passer and defensive holding enforcement standards -- that
+materially altered the play-calling and scoring environment, creating a
+structural break in historical EPA distributions
+\parencite{yurko2019nflwar}. Including pre-2018 seasons
+without accounting for this break would conflate distinct offensive regimes.
+Second, the expanded playoff format adopted from the 2020 season \parencite{nfl2020playoffexpansion} (14 teams
+rather than 12) is fully contained within the training window, ensuring that
+the \xscore{} model is calibrated to the post-expansion competitive
+landscape. Third, \texttt{nflfastR} tracking-quality metadata and charting
+consistency are substantially more reliable from 2018 onward.
+
+Two auxiliary datasets bracket the primary window. The
+out-of-distribution (OOD) validation set covers seasons 2014--2017
+(four seasons, 134,274 filtered plays across 23,802 drives), providing a
+temporal stress test that evaluates model generalization to a pre-rule-change
+era with systematically different scoring rates. The held-out test set
+consists of the 2025 season (34,415 plays across 5,803 drives), which was
+withheld entirely from all modeling and hyperparameter decisions; it is used
+exclusively for final performance reporting. The rationale for a strict temporal test set is elaborated in
+\Cref{sec:split}.
+
+\subsection{Play Filtering}
+\label{sec:play-filtering}
+
+Play-by-play records were subject to a multi-step filtering procedure to
+retain only observations that represent genuine offensive possession attempts.
+\Cref{tab:play-filtering} summarizes the inclusion and exclusion criteria.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Play filtering criteria applied to the raw \texttt{nflfastR}
+           play-by-play data. Approximately 241,000 offensive snaps remain
+           after all exclusions are applied to the 2018--2024 training window.}
+  \label{tab:play-filtering}
+  \begin{tabularx}{\textwidth}{lXl}
+    \toprule
+    \textbf{Category} & \textbf{Description} & \textbf{Action} \\
+    \midrule
+    Pass play          & Forward pass attempt, including incomplete passes
+                         and plays drawn as pass interference
+                       & \textbf{Include} \\
+    Rush play          & Designed run and scramble by quarterback
+                       & \textbf{Include} \\
+    Sack               & Quarterback sacked behind the line of scrimmage;
+                         recorded as a pass attempt in \texttt{nflfastR}
+                       & \textbf{Include} \\
+    \midrule
+    Kickoff            & Kickoff and onside kick plays
+                       & Exclude \\
+    Punt               & Punt and fake-punt coded as punt
+                       & Exclude \\
+    Extra point        & One-point PAT kick after touchdown
+                       & Exclude \\
+    Two-point conversion & Post-touchdown scrimmage play; not a drive snap
+                       & Exclude \\
+    QB kneel           & End-of-game clock management; zero offensive intent
+                       & Exclude \\
+    QB spike           & Clock-stopping spike; no yardage or EPA signal
+                       & Exclude \\
+    Aborted snap       & Fumbled or muffed snap resulting in no play
+                       & Exclude \\
+    Missing down       & Records where \texttt{down} is \texttt{NA}
+                       & Exclude \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+The decision to retain sacks alongside pass and run plays reflects
+standard practice in EPA-based NFL research \parencite{yurko2019nflwar}:
+a sack is a negative-outcome pass play and its EPA penalty is an essential
+signal for modeling offensive efficiency. Quarterback kneels and spikes are
+excluded because they carry no strategic information about touchdown
+probability; including them would introduce systematic downward bias in the
+feature distributions associated with end-of-half and end-of-game
+situations. Two-point conversions are excluded because they originate at the
+two-yard line, making their field-position feature values incommensurable
+with normal drive plays.
+
+\subsection{Target Variable}
+
+The target variable $y \in \{0, 1, 2, 3\}$ is a categorical label defined at
+the \emph{drive} level and broadcast back to each constituent play within that
+drive. Each drive terminates in exactly one of four mutually exclusive outcome
+classes:
+
+\begin{equation}
+  y =
+  \begin{cases}
+    \text{TD}         & \text{if the drive ends in an offensive touchdown}, \\
+    \text{FG}         & \text{if the drive ends in a made field goal}, \\
+    \text{Turnover}   & \text{if the drive ends in an interception or fumble}, \\
+    \text{Punt/Other} & \text{otherwise (punt, failed 4th down, end of half, safety).}
+  \end{cases}
+\end{equation}
+
+Defensive touchdowns (e.g., pick-sixes) and special-teams touchdowns are not
+credited to the possession team's drive outcome; such drives are classified as
+turnovers (if the score resulted from a turnover return) or Punt/Other.
+
+A drive-level target was preferred over a play-level EPA target for three
+substantive reasons. First, drive-level outcomes capture the \emph{sustained
+execution} of an offensive possession rather than the marginal value of a
+single play. A series of modest positive-EPA plays that culminates in a
+field goal is qualitatively different from a series that culminates in a
+touchdown, and it is these distinctions that the multinomial \xscore{} model
+is designed to quantify. Second, EPA is susceptible to garbage-time inflation:
+late in games with large score differentials, EPA weights shift dramatically
+due to reduced win-probability leverage, and play-level EPA targets in such
+situations would conflate strategy with arithmetic artifact. Third, the
+resulting probability vector $\xscore(\text{state})$ is directly
+interpretable as the expected distribution of drive outcomes for drives
+initiated from an equivalent situational state, which aligns naturally with
+the expected-goals framing prominent in related sports analytics literature.
+
+Although the outcome is defined at the drive level, the model is trained on
+play-level observations -- each play inherits the outcome label of the drive
+it belongs to, ensuring that every situational state within a drive is
+associated with the eventual outcome. Because touchdown-scoring drives contain
+more plays on average than failed drives, the play-level class distribution
+(TD 30.4\%, FG 20.8\%, Turnover 16.0\%, Punt/Other 32.8\%) overrepresents
+TDs relative to the drive-level rate of approximately 20\%. This imbalance is
+addressed through the multiclass log-loss objective during training, and
+stratified sampling during cross-validation ensures each fold preserves the
+class distribution. Gradient boosted tree methods are robust to such ratios
+\parencite{chen2016xgboost}.
+
+\subsection{Feature Engineering}
+
+Eleven features are constructed for each play observation, organized into two
+phases of development. Phase~1 features encode the \emph{situational state}
+of the play as observable from public box-score data; Phase~2 features
+incorporate team-level offensive and defensive quality signals derived from
+rolling EPA histories. \Cref{tab:features} provides a complete specification.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Feature set for the \xscore{} model. Phase~1 features describe
+           in-game situational state; Phase~2 features encode opponent-adjusted
+           team quality. EPA: Expected Points Added
+           \parencite{yurko2019nflwar}.}
+  \label{tab:features}
+  \small
+  \begin{tabularx}{\textwidth}{l l X c}
+    \toprule
+    \textbf{Feature} & \textbf{Type} & \textbf{Description} & \textbf{Phase} \\
+    \midrule
+    \texttt{down}                     & Ordinal (1--4) & Current down & 1 \\
+    \texttt{ydstogo}                  & Continuous     & Yards required for first down or TD & 1 \\
+    \texttt{yardline\_100}            & Continuous     & Yards from opponent's end zone (0--100) & 1 \\
+    \texttt{score\_diff}              & Continuous     & Possession team minus defensive team score & 1 \\
+    \texttt{half\_seconds\_remaining} & Continuous     & Seconds remaining in current half & 1 \\
+    \texttt{goal\_to\_go}             & Binary (0/1)   & First-down marker is the goal line & 1 \\
+    \texttt{red\_zone}                & Binary (0/1)   & LOS within opponent's 20-yard line & 1 \\
+    \midrule
+    \texttt{rolling\_offense\_epa}    & Continuous     & EWMA offensive EPA/play, shrunk to league mean & 2 \\
+    \texttt{rolling\_defense\_epa}    & Continuous     & EWMA defensive EPA/play allowed & 2 \\
+    \texttt{momentum\_epa}            & Continuous     & EWMA EPA of possession team's plays this game & 2 \\
+    \texttt{is\_home}                 & Binary (0/1)   & Possession team is designated home team & 2 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+The EPA values underlying all Phase~2 features are computed using the
+\texttt{nflfastR} implementation of the Expected Points framework, which
+models pre-snap expected point value as a function of down, distance, and
+field position estimated over the full play-by-play history of the NFL
+\parencite{yurko2019nflwar}. EPA for a given play is thus the change in
+expected point value from before the snap to after the play resolves.
+
+The two rolling team-quality features (the offensive and defensive EPA
+rolling averages listed in \Cref{tab:features}) are computed using
+exponential decay with a per-game decay factor $\lambda = 0.5$, meaning
+that each prior game
+receives weight $\lambda^{i}$ where $i$ is the number of games ago,
+so that more distant games contribute exponentially less to the estimate. To guard
+against extreme estimates early in a season -- when only a small number of
+game observations are available -- both rolling features are regularized via
+Bayesian shrinkage toward the league-mean EPA rate, with a prior weight
+equivalent to $k = 4$ prior games. Formally, if a team has played $n$ games
+with exponentially weighted mean EPA $\bar{\mu}_n$, and the league-mean EPA
+is $\mu_0$, the shrunk estimate is
+
+\begin{equation}
+  \hat{\mu} = \frac{k\,\mu_0 + n\,\bar{\mu}_n}{k + n}.
+\end{equation}
+
+This formulation ensures that teams are not erroneously labeled as elite or
+poor on the basis of one or two games at the start of a season -- a known
+deficiency in na\"{i}ve rolling-average approaches
+\parencite{lock2014randomforests}.
+
+\subsection{Train, Validation, and Test Splits}
+\label{sec:split}
+
+A strict temporal split strategy is employed throughout this study. The
+training set comprises all filtered plays from the 2018--2024 seasons (seven
+seasons), the held-out test set is the 2025 season, and the OOD evaluation
+set is the 2014--2017 seasons (four seasons prior to the rule-change
+boundary).
+
+Random cross-sectional splitting was explicitly rejected for two reasons.
+First, the Phase~2 features (\texttt{rolling\_offense\_epa},
+\texttt{rolling\_defense\_epa}, \texttt{momentum\_epa}) encode season- and
+week-specific team quality estimates that are computed using earlier plays
+within the same season. A random train-test split would place some plays
+from week~12 in the training set and plays from week~6 of the same season
+in the test set; because the week-12 rolling estimate incorporates the
+week-6 games, this constitutes a direct form of data leakage. Temporal
+splitting eliminates this leakage by ensuring that all test-set observations
+are strictly posterior to all training-set observations.
+
+Second, the NFL scheduling structure introduces systematic autocorrelation:
+teams play the same opponents in the same stadium multiple times within a
+season, and roster composition evolves through trades, injuries, and
+practice-squad promotions on a weekly basis. A model evaluated on a randomly
+drawn $20\%$ hold-out would be tested on games from the same weeks as its
+training data, artificially inflating apparent performance relative to a
+genuine prospective deployment scenario.
+
+Hyperparameter selection was performed via five-fold cross-validation
+conducted within the training window using temporally ordered folds (i.e.,
+fold $k+1$ is always drawn from seasons later than fold $k$), preserving
+the no-leakage guarantee during model selection. All reported evaluation
+metrics in \Cref{ch:results} are computed exclusively on the 2025 test set,
+which was not examined at any stage of model development.
