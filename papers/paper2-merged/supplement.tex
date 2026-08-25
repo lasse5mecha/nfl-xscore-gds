@@ -1,0 +1,234 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[english]{babel}
+\usepackage{csquotes}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{adjustbox}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[hypertexnames=false]{hyperref}
+\usepackage{cleveref}
+\usepackage{float}
+
+\usepackage[style=apa,backend=biber,natbib=true]{biblatex}
+\addbibresource{references.bib}
+\DeclareLanguageMapping{english}{english-apa}
+
+\newcommand{\xscore}{\textit{xScore}}
+\newcommand{\xvoa}{\textit{xVOA}}
+\newcommand{\gds}{\textit{GDS}}
+
+\emergencystretch=2em
+\widowpenalty=10000
+\clubpenalty=10000
+
+\title{Online Supplement: Game Deserved Score --\\Decomposing NFL Team Quality and Testing\\the Defensive Dominance Hypothesis}
+\author{Lasse Mecha}
+\date{2026}
+
+\begin{document}
+\maketitle
+
+\noindent This supplement reports validation and robustness evidence referenced in, but not
+reproduced in, the main paper. All numbers use the same 256-team-season sample (2018--2025)
+and the same fixed \xscore{}/\gds{} pipeline as the main paper; none of the material here
+changes the paper's conclusions, which is why it appears separately rather than in the body.
+Section numbers below are independent of the main paper's numbering and are cross-referenced
+from it by section title, not by number.
+
+\section*{S1. Luck Analysis}
+
+\gds{}-implied wins are the fitted values from the season-level regression of win percentage
+on \gds{}/game, estimated on the full 256-team-season sample and applied to the most recently
+completed season (2025). The gap between actual and implied wins operationalizes luck.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Luckiest and unluckiest teams in the 2025 NFL regular season by divergence between
+  actual wins and \gds{}-implied wins, using the full-sample (2018--2025) regression fit.}
+  \begin{tabular}{lrrr}
+    \toprule
+    \textbf{Team} & \textbf{Actual Wins} & \textbf{GDS-Implied} & \textbf{Divergence} \\
+    \midrule
+    \multicolumn{4}{l}{\textit{Luckiest}} \\[2pt]
+    CHI & 11 & 8.5  & $+2.5$ \\
+    DEN & 14 & 11.7 & $+2.3$ \\
+    PIT & 10 & 7.8  & $+2.2$ \\[6pt]
+    \multicolumn{4}{l}{\textit{Unluckiest}} \\[2pt]
+    NYG &  4 & 6.8  & $-2.8$ \\
+    IND &  8 & 11.2 & $-3.2$ \\
+    KC  &  6 & 9.7  & $-3.7$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Kansas City is the most striking case: moderate \gds{} implying roughly 9.7 wins, yet only 6
+actual wins -- the largest negative divergence in the sample. Chicago, Denver, and Pittsburgh
+each outperformed their process-quality expectation by 2+ wins. These divergences reinforce the
+main paper's core motivation for using \gds{} rather than win-loss record alone: win totals are
+an imperfect proxy for underlying quality, and process-based measurement captures information
+outcome-based records do not.
+
+\section*{S2. Baseline Comparison: Point Differential}
+
+Raw point differential per game is trivially available and requires no model. Across the full
+256-team-season sample, point differential achieves $r = 0.900$ with win percentage
+($R^2 = 81.0\%$), compared to \gds{}'s $r = 0.862$ ($R^2 = 74.3\%$) -- a 6.7-percentage-point
+gap. This is expected and does not undermine \gds{}'s utility: point differential contains the
+very outcome information \gds{} deliberately excludes (it is partially tautological, since wins
+are defined by outscoring the opponent), whereas \gds{} measures process quality net of that
+outcome variance. The value of \gds{} over point differential is not raw predictive power but
+three properties point differential lacks: decomposability into offense/defense/special-teams
+components, process measurement that treats garbage-time execution differently from
+competitive-situation execution (via score-differential conditioning), and separation of skill
+from the outcome variance that S1's luck analysis exploits directly.
+
+\section*{S3. Per-Season Correlation Stability}
+
+\begin{table}[htbp]
+  \centering
+  \caption{Per-season Pearson $r$ between \gds{}/game and win percentage ($n = 32$ teams per
+  season, all eight seasons in the sample).}
+  \begin{tabular}{lcc}
+    \toprule
+    \textbf{Season} & \textbf{Pearson $r$} & \textbf{$R^2$} \\
+    \midrule
+    2018 & 0.871 & 75.9\% \\
+    2019 & 0.818 & 67.0\% \\
+    2020 & 0.881 & 77.7\% \\
+    2021 & 0.877 & 76.9\% \\
+    2022 & 0.886 & 78.6\% \\
+    2023 & 0.847 & 71.7\% \\
+    2024 & 0.875 & 76.5\% \\
+    2025 & 0.888 & 78.8\% \\
+    \midrule
+    \textit{Pooled} & 0.862 & 74.3\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Per-season correlations range from $r = 0.818$ (2019) to $r = 0.888$ (2025 -- the newest,
+out-of-sample season, at the high end of the range rather than an outlier), with no season
+below $r = 0.82$. This confirms the pooled correlation is not driven by any single season and
+that the relationship between \gds{} and winning is stable across the entire study window,
+including the season added after the underlying model was built.
+
+\section*{S4. Year-Over-Year Rank Stability}
+
+Across the seven consecutive-season pairs available in an eight-season sample (2018--2019
+through 2024--2025), the Spearman rank correlation between consecutive-season \gds{}/game
+rankings averages $\rho = 0.374$ ($n = 32$ per pair; range $0.183$ to $0.617$):
+2018--19: $\rho=0.617$; 2019--20: $\rho=0.489$; 2020--21: $\rho=0.479$; 2021--22: $\rho=0.207$;
+2022--23: $\rho=0.352$; 2023--24: $\rho=0.183$; 2024--25: $\rho=0.289$. This moderate
+persistence is consistent with the NFL's competitive-balance mechanisms (draft order, salary
+cap, free agency) promoting substantial year-over-year turnover while not eliminating quality
+persistence entirely.
+
+\section*{S5. Split-Half Reliability}
+
+Correlating \gds{}/game computed from odd-numbered weeks against even-numbered weeks tests
+whether roughly half a season's data produces consistent team rankings. The Spearman rank
+correlation, computed separately for each season and averaged, is $\rho = 0.477$ (per-season:
+2018: 0.474; 2019: 0.356; 2020: 0.632; 2021: 0.580; 2022: 0.302; 2023: 0.413; 2024: 0.560; 2025:
+0.500). The Spearman-Brown prophecy formula implies a full-season reliability of
+$2 \times 0.477 / (1 + 0.477) = 0.646$, indicating adequate measurement reliability for
+cross-team comparison at full-season aggregation, with meaningful differentiation available by
+roughly mid-season.
+
+\section*{S6. Full Robustness Detail}
+
+Summary versions of all six checks appear in the main paper's robustness table; full detail is
+reported here.
+
+\paragraph{Opponent-strength control.} Re-estimating the OLS model (playoff wins on offensive
+and defensive \xvoa{}/game) with a leave-one-out opponent-quality covariate added:
+$\hat\beta_{\text{off}} = 0.099$ ($p<0.0001$), $\hat\beta_{\text{def}} = 0.071$ ($p<0.0001$),
+$\hat\beta_{\text{opp}} = -0.013$ ($p = 0.830$), $R^2 = 0.267$ (unchanged from the uncontrolled
+model). The opponent-strength coefficient is statistically indistinguishable from zero and
+neither offensive nor defensive coefficients move, providing direct evidence against the
+schedule-strength confound.
+
+\paragraph{Field-position mediation.} The correlation between defensive \xvoa{}/game and a
+team's average starting field-position advantage is $r = -0.151$ ($p = 0.0157$) -- a real but
+weak mediating pathway. The total correlation between offensive \xvoa{}/game and playoff wins
+is $r = 0.439$; the partial correlation controlling for starting field position is
+$r_{\text{partial}} = 0.404$. Mediation percentage: $(0.439 - 0.404)/0.439 = 8.0\%$. Just over
+90\% of the offensive-\xvoa{}-to-wins association is independent of any field-position benefit
+that better defenses might confer on their own offense.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Threshold sensitivity: mean playoff wins for defense-dominant team-seasons across
+  the full range of archetype-threshold definitions tested.}
+  \begin{tabular}{lcc}
+    \toprule
+    \textbf{Threshold} & \textbf{$n$ (Def-Dominant)} & \textbf{Mean PW} \\
+    \midrule
+    $\pm0.20$ & 42 & 0.000 \\
+    $\pm0.25$ & 38 & 0.000 \\
+    $\pm0.30$ & 32 & 0.000 \\
+    $\pm0.35$ & 28 & 0.000 \\
+    $\pm0.40$ & 26 & 0.000 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption{Time-window sensitivity of the offensive-to-defensive $R^2$ ratio.}
+  \begin{tabular}{lcc}
+    \toprule
+    \textbf{Window} & \textbf{$R^2$ Ratio (Off:Def)} & \textbf{$n$ (team-seasons)} \\
+    \midrule
+    2018--2025 (full) & 2.6:1 & 256 \\
+    2018--2023        & 3.2:1 & 192 \\
+    2020--2025        & 2.8:1 & 192 \\
+    2021--2025        & 2.7:1 & 160 \\
+    2018--2021        & 2.5:1 & 128 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Single-team exclusion.} Excluding Kansas City 2023 (lowest offense share among
+champions before this paper's extension): ratio $= 2.7$:$1$, Spearman $\rho = 0.221$
+($p = 0.022$). Excluding Seattle 2025 (the newest champion, to confirm the newest season alone
+is not driving the result): ratio $= 2.7$:$1$, Spearman $\rho = 0.215$ ($p = 0.026$). Both
+exclusions leave the full-sample estimates ($2.6$:$1$, $\rho = 0.208$) essentially unchanged.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Era comparison. Spearman: offense share vs.\ playoff wins (playoff teams only).
+  Pearson: \xvoa{} components vs.\ win percentage (all team-seasons).}
+  \begin{tabular}{lrrr}
+    \toprule
+    \textbf{Measure} & \textbf{2018--2020} & \textbf{2021--2025} & \textbf{$\Delta$} \\
+    \midrule
+    Spearman $\rho$ (share vs.\ PW)      & $0.305$ ($p=0.063$) & $0.163$ ($p=0.177$) & $-0.142$ \\
+    Sample ($n$, playoff teams)          & 38                  & 70                   & \\[4pt]
+    Pearson $r$ (off \xvoa{} vs.\ Win\%) & $0.622$             & $0.701$              & $+0.079$ \\
+    Pearson $r$ (def \xvoa{} vs.\ Win\%) & $0.397$             & $0.427$              & $+0.030$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Neither era's Spearman coefficient reaches significance individually, and -- as the main paper
+notes explicitly in its Structural Explanations discussion -- the defensive Pearson coefficient
+strengthens slightly in the later era rather than weakening, which is different from what the
+224-team-season-only version of this analysis showed. We report the updated numbers as-is
+rather than retaining the earlier, cleaner-sounding pattern.
+
+\section*{Data and Code Availability}
+
+All numbers in this supplement are reproducible from
+\texttt{papers/paper2-merged/compute\_placeholders.py}, run against
+\texttt{output/archetype\_v2\_data.csv} and \texttt{output/multinomial\_game\_gds.csv}. See the
+main paper's Data and Code Availability statement for the full repository link.
+
+\printbibliography
+
+\end{document}
